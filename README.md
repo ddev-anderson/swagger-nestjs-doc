@@ -1,73 +1,140 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# NestJS - Swagger - Documentação de Endpoint
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+O Swagger é uma biblioteca para documentação de backend, realiza a geração de um site interno que descreve com detalhes cada endpoint e estrutura de entidades presentes sua aplicação.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Além disso também oferece uma interface para que a API seja testada, sem precisar de um cliente HTTP externo (Postman, Insomnia, etc)
 
-## Description
+## Instalação
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Installation
+- `@nestjs/swagger`
+- `swagger-ui-express`
 
 ```bash
-$ npm install
+npm install --save @nestjs/swagger swagger-ui-express
 ```
 
-## Running the app
+## Configuração
+
+Abra o arquivo `main.ts` e adicione o seguinte conteúdo:
+
+`src/main.ts`
+
+```typescript
+import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  const config = new DocumentBuilder()
+    .setTitle('Documentação com Swagger - Fábrica de Sinapse')
+    .setDescription(
+      'O Swagger (aka OpenApi) é uma biblioteca muito conhecida no universo backend, estando disponível para diversas linguagens e frameworks. Ela gera um site interno no seu backend que descreve, com muitos detalhes, cada endpoint e estrutura de entidades presentes na sua aplicação.',
+    )
+    .setVersion('1.0')
+    .addTag('users')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
+  await app.listen(3000);
+}
+
+bootstrap();
+```
+
+## Acessando
+
+Execute a aplicação
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm run start:dev
 ```
 
-## Test
+Abra a URL no seu navegador
 
-```bash
-# unit tests
-$ npm run test
+http://localhost:3000/api/
 
-# e2e tests
-$ npm run test:e2e
+Pronto!
 
-# test coverage
-$ npm run test:cov
+![image](https://github.com/user-attachments/assets/95c6b88b-9e63-49c8-8334-d452074c9e2d)
+
+## Tags
+As tags são utilizadas para sinalizar quais controles vão ser adicionados ao swagger, por exemplo para adicionar o `UsersController`, só é nescessario adicionar a tag `@ApiTags('users')` que vem com a biblioteca `@nestjs/swagger`.
+
+`src/users/users.controller.ts`
+
+```typescript
+@ApiTags('users')
+@Controller('users')
+export class UsersController {
+  ....
+}
 ```
 
-## Support
+Salve o arquivo para que o Nest recarregue a aplicação automaticamente e atualize a página do swagger.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Testando requisições
 
-## Stay in touch
+Para testar a requisições, basta clicar em cima de um dos endpoints desejados para visualizar a sua estrutura.
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+![image](https://github.com/user-attachments/assets/5bbb4fb4-f88a-4df1-a79e-6ffb281d1bff)
 
-## License
+Clique no botão `Try it out` e depois em `Execute` para realizar a requisição HTTP.
 
-Nest is [MIT licensed](LICENSE).
+![image](https://github.com/user-attachments/assets/ddbfc564-8014-4924-a404-d0be3f6b9591)
+
+## Documentando a declaração de entidades
+
+Adicione comentários antes de cada propriedade e o Swagger irá utilizar as informações dos comentários para exibir na documentação de endpoints.
+
+Exemplo:
+
+`src/users/dto/create-user.dto.ts`
+
+```typescript
+export class CreateUserDto {
+  /**
+   * O nome será utilizado para qualquer coisa (Perfil, Home Page, etc) que precise exibir
+   * informações da pessoa conectada.
+   * @example Usuario teste
+   */
+  name: string;
+
+  /**
+   * O e-mail é necessário apra o login
+   * @example email@email.com
+   */
+  email: string;
+
+  /**
+   * Senha de login
+   * @example 123@abc
+   */
+  password?: string;
+}
+```
+
+Após isso, é necessario ativar a opção `introspectComments` de configuração do `@nestjs/swagger` no arquivo `nest-cli.json`.
+
+`nest-cli.json`
+
+```json
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "src",
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "@nestjs/swagger",
+        "options": {
+          "classValidatorShim": false,
+          "introspectComments": true
+        }
+      }
+    ]
+  }
+}
+```
